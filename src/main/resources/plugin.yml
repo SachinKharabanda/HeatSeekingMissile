@@ -1,0 +1,4 @@
+name: HeatSeekingMissile
+version: '1.0-SNAPSHOT'
+main: io.github.sachinkharabanda.heatSeekingMissile.Main
+api-version: '1.18'
