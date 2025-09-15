@@ -5,9 +5,14 @@ api-version: '1.21'
 commands:
   hsm:
     description: Heat Seeking Missile commands
-    usage: /<command> [help|reload]
-    permission: hsm.cmds
+    usage: /<command> [help|get|give|reload]
     aliases: [heatseekingmissile]
 permissions:
   hsm.cmds:
-    description: Ac
+    default: op
+  hsm.get:
+    default: op
+  hsm.give:
+    default: op
+  hsm.reload:
+    default: op
