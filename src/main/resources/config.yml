@@ -1,0 +1,31 @@
+#Missile config
+#Plugin placeholder: %ammo% shows how much ammo is in the weapon
+Missile-settings:
+  Item: WOODEN_HOE
+  Maximum-amount: 1
+  Display-name: "&cHeat Seeking Missile"
+  Lore:
+    - "&c&l• &7Weapon class: &cCheatcode"
+    - "&c&l• &7Damage: &c25"
+    - "&c&l• &7Ammo required: &cN/A"
+    - "&c&l• &7Ammo capacity: &C1"
+    - "&c&l• &7Reload time: &C15s"
+    - "&c&l• &7Tier: &c5"
+    - ""
+    - "&7&o(Target receives poison and"
+    - "&7&oslowness upon impact)"
+  Subtitle-display: "&cHeat Seeking Missile «%ammo%»"
+  Shoot:
+    Projectile-dmg: 25
+    Projectile-speed: 15
+    Homing-radius: 5 #(blocks)
+    Equip-delay: 0 #(ticks)
+    Delay-between-shots: 100 #(ticks)
+    Chase-time: 100 #in ticks
+    Shoot-noise: BLOCK_STONE_BUTTON_CLICK_ON-1-0-0, BLOCK_FIRE_EXTINGUISH-1-0-2 #configured as: SOUND-VOLUME-PITCH-DELAY (ticks)
+    Hit-noise: ENTITY_PLAYER_HURT-1-0-0
+    Potion-affects: POISON-60-1 #configured as: POTIONTYPE-DURATION-LEVEL
+  Reload:
+    Reload-time: 300 #(ticks)
+    Reload-noise: ENTITY_PLAYER_LEVELUP-1-0-299
+    Reload-in-hand: false

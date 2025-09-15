@@ -1,0 +1,27 @@
+#plugin only placeholders: %shooter% (the one who shoots), and %target% (the one being shot at),
+#%max% is the maximum amount of homing missiles allowed in ones inventory
+
+prefix: "&8[&3Missile&8] &r"
+
+#help commands
+help-msgs:
+  cmd-info: "&fCommand information"
+  get-help: "&b/hsm get &fgives you a Heat Seeking Missile."
+  give-help: "&b/hsm give [player] &fgives a specified player a Heat Seeking Missiles."
+  reload-msg: "&b/hsm reload &freloads the plugin config."
+
+#plugin messages
+plugin-reload-msg: "The plugin has been reloaded."
+received-hsm: "You have received a Heat Seeking Missile."
+sent-hsm: "You have sent a Heat Seeking Missile to %target%."
+no-perms: "You do not have permission to execute this command."
+
+#pvp messages
+shoot-at-target: "&fYou have shot a homing missile at &b%target%&f!"
+shot-at-by-shooter: "&b%shooter% &fhas shot a homing missile at you!"
+target-hit: "Your homing missile has hit &b%target%&f."
+lost-control: "&fYour homing missile has lost &b%target%&f"
+missile-reloaded: "&fYour homing missile is now reloaded."
+
+#inventory control message
+limit-hsm: "&fYour only allowed &b%max% &famount of homing missiles in your inventory at one time."
