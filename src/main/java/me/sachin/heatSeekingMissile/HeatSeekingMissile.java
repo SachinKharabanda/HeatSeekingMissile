@@ -2,12 +2,14 @@ package me.sachin.heatSeekingMissile;
 
 import me.sachin.heatSeekingMissile.missile.MissileItem;
 import org.bukkit.plugin.java.JavaPlugin;
+import me.sachin.heatSeekingMissile.missile.MissileHoldListener;
 
 public final class HeatSeekingMissile extends JavaPlugin {
 
     private ConfigManager configs;
     private Msg msg;
     private MissileItem missileItem;
+
 
     @Override
     public void onEnable() {
@@ -32,6 +34,10 @@ public final class HeatSeekingMissile extends JavaPlugin {
         } else {
             getLogger().severe("Command 'hsm' not found in plugin.yml");
         }
+
+        //show subtitle when player switches to the missile
+        getServer().getPluginManager().registerEvents(new MissileHoldListener(this, missileItem), this);
+
     }
 
     /**

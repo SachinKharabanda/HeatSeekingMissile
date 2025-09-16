@@ -1,6 +1,8 @@
 package me.sachin.heatSeekingMissile.missile;
 
 import me.sachin.heatSeekingMissile.ConfigManager;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -143,4 +145,22 @@ public class MissileItem {
     private static String color(String s) {
         return ChatColor.translateAlternateColorCodes('&', s == null ? "" : s);
     }
+
+    public boolean isHolding(Player p) {
+        return isMissile(p.getInventory().getItemInMainHand())
+                || isMissile(p.getInventory().getItemInOffHand());
+    }
+
+    /** Shows only the subtitle (no title). Tweaks are optional. */
+    public void showSubtitle(Player p) {
+        if (subtitleTemplate == null || subtitleTemplate.isBlank()) return;
+        String msg = color(subtitleTemplate); // supports &-colors
+        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
+    }
+
+    /** Convenience: only show if currently holding the missile. */
+    public void showSubtitleIfHolding(Player p) {
+        if (isHolding(p)) showSubtitle(p);
+    }
+
 }
