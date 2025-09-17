@@ -46,8 +46,8 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(msg.get().withPrefix("no-perms"));
                     return true;
                 }
-                configs.reloadAll(); // reload config.yml + messages.yml
-                afterReload.run();   // rebuild Msg and reload MissileItem snapshot
+                configs.reloadAll();  // does plugin.reloadConfig() and messages.yml
+                afterReload.run();    // rebuild Msg + missileItem.reload() + missileManager.reloadFromConfig()
                 sender.sendMessage(msg.get().withPrefix("plugin-reload-msg"));
                 return true;
             }

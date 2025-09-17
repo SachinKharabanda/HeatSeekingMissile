@@ -20,6 +20,7 @@ no-perms: "You do not have permission to execute this command."
 shoot-at-target: "&fYou have shot a homing missile at &b%target%&f!"
 shot-at-by-shooter: "&b%shooter% &fhas shot a homing missile at you!"
 target-hit: "Your homing missile has hit &b%target%&f."
+no-target: "There is no target for you to shoot at."
 lost-control: "&fYour homing missile has lost &b%target%&f"
 missile-reloaded: "&fYour homing missile is now reloaded."
 

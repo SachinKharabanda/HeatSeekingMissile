@@ -1,6 +1,8 @@
 package me.sachin.heatSeekingMissile;
 
 import me.sachin.heatSeekingMissile.missile.MissileItem;
+import me.sachin.heatSeekingMissile.missile.MissileManager;
+import me.sachin.heatSeekingMissile.missile.MissileShootListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import me.sachin.heatSeekingMissile.missile.MissileHoldListener;
 
@@ -9,24 +11,29 @@ public final class HeatSeekingMissile extends JavaPlugin {
     private ConfigManager configs;
     private Msg msg;
     private MissileItem missileItem;
-
+    private me.sachin.heatSeekingMissile.missile.MissileManager missileManager;
 
     @Override
     public void onEnable() {
-        // Ensure config.yml exists
         saveDefaultConfig();
 
-        // Load messages.yml (your ConfigManager handles this)
         configs = new ConfigManager(this);
         configs.loadAll();
 
-        // Build Msg (reads messages.yml)
         msg = new Msg(configs.messages());
-
-        // Build the missile item snapshot (reads from config.yml)
         missileItem = new MissileItem(this, configs);
 
-        // Register /hsm command
+        // create + keep the manager (one instance!)
+        missileManager = new me.sachin.heatSeekingMissile.missile.MissileManager(this, configs, msg, missileItem);
+
+        // listener that shows the action bar when you hold the item (pass manager so it can cancel reload)
+        getServer().getPluginManager().registerEvents(
+                new me.sachin.heatSeekingMissile.missile.MissileHoldListener(this, missileItem, missileManager), this);
+
+        // right-click to fire
+        getServer().getPluginManager().registerEvents(
+                new me.sachin.heatSeekingMissile.missile.MissileShootListener(missileItem, missileManager, msg), this);
+
         if (getCommand("hsm") != null) {
             getCommand("hsm").setExecutor(
                     new Commands(configs, this::afterReload, () -> msg, missileItem)
@@ -34,19 +41,15 @@ public final class HeatSeekingMissile extends JavaPlugin {
         } else {
             getLogger().severe("Command 'hsm' not found in plugin.yml");
         }
-
-        //show subtitle when player switches to the missile
-        getServer().getPluginManager().registerEvents(new MissileHoldListener(this, missileItem), this);
-
     }
 
-    /**
-     * Called after /hsm reload.
-     * ConfigManager.reloadAll() already reloads config.yml and messages.yml.
-     * We just rebuild the in-memory helpers to reflect new values.
-     */
     private void afterReload() {
+        // messages.yml + config.yml have already been reloaded by ConfigManager.reloadAll()
         msg = new Msg(configs.messages());
         missileItem.reload();
+        if (missileManager != null) {
+            missileManager.reloadFromConfig();  // <-- this is what updates Shoot.* and Reload.*
+        }
     }
+
 }

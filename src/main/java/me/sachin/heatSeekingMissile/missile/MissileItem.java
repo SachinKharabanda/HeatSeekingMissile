@@ -36,6 +36,9 @@ public class MissileItem {
     private int defaultAmount;
     private int maxAmount = 1;
     private NamespacedKey pdcKey;
+    private NamespacedKey ammoKey;
+    private NamespacedKey reloadingKey; // (optional, used only for display)
+
 
     public MissileItem(JavaPlugin plugin, ConfigManager configs) {
         this.plugin = plugin;
@@ -78,6 +81,9 @@ public class MissileItem {
         String key = cfg.getString(base + "PDC-key", "hsm_missile");
         this.pdcKey = new NamespacedKey(plugin, key);
 
+        this.ammoKey = new NamespacedKey(plugin, "hsm_ammo");
+        this.reloadingKey = new NamespacedKey(plugin, "hsm_reloading");
+
         // Optional subtitle template (if you use it elsewhere)
         this.subtitleTemplate = cfg.getString(base + "Subtitle-display", "");
     }
@@ -115,6 +121,13 @@ public class MissileItem {
                 if (m2 != null) { m2.addItemFlags(ItemFlag.HIDE_ENCHANTS); stack.setItemMeta(m2); }
             }
         }
+
+        // inside buildItem(int amount) after you fetched meta:
+        PersistentDataContainer pdc = meta.getPersistentDataContainer();
+        pdc.set(pdcKey, PersistentDataType.BYTE, (byte) 1);
+        pdc.set(ammoKey, PersistentDataType.INTEGER, 1);        // capacity 1
+        pdc.set(reloadingKey, PersistentDataType.BYTE, (byte) 0);
+
         return stack;
     }
 
@@ -162,5 +175,44 @@ public class MissileItem {
     public void showSubtitleIfHolding(Player p) {
         if (isHolding(p)) showSubtitle(p);
     }
+
+    // ---- Ammo helpers ----
+    public int getAmmo(ItemStack stack) {
+        if (stack == null || !stack.hasItemMeta()) return 0;
+        Integer v = stack.getItemMeta().getPersistentDataContainer().get(ammoKey, PersistentDataType.INTEGER);
+        return v == null ? 0 : v;
+    }
+
+    public void setAmmo(ItemStack stack, int v) {
+        if (stack == null || !stack.hasItemMeta()) return;
+        ItemMeta m = stack.getItemMeta();
+        m.getPersistentDataContainer().set(ammoKey, PersistentDataType.INTEGER, Math.max(0, Math.min(1, v)));
+        stack.setItemMeta(m);
+    }
+
+    public void setReloadingFlag(ItemStack stack, boolean reloading) {
+        if (stack == null || !stack.hasItemMeta()) return;
+        ItemMeta m = stack.getItemMeta();
+        m.getPersistentDataContainer().set(reloadingKey, PersistentDataType.BYTE, (byte) (reloading ? 1 : 0));
+        stack.setItemMeta(m);
+    }
+
+    public boolean isReloading(ItemStack stack) {
+        if (stack == null || !stack.hasItemMeta()) return false;
+        Byte v = stack.getItemMeta().getPersistentDataContainer().get(reloadingKey, PersistentDataType.BYTE);
+        return v != null && v == (byte)1;
+    }
+
+    // Action-bar subtitle with %ammo% and optional ᴿ
+    public void showSubtitleFor(Player p, ItemStack held) {
+        if (subtitleTemplate == null || subtitleTemplate.isBlank()) return;
+        boolean reloading = isReloading(held);
+        String msg = subtitleTemplate.replace("%ammo%", String.valueOf(getAmmo(held)));
+        if (reloading) msg = msg + " ᴿ";
+        // Bungee action bar (works on Paper/Spigot)
+        p.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                net.md_5.bungee.api.chat.TextComponent.fromLegacyText(color(msg)));
+    }
+
 
 }
