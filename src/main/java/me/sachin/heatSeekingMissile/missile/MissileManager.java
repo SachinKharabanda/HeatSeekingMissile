@@ -103,10 +103,21 @@ public class MissileManager implements Listener {
         if (!item.isMissile(held)) held = shooter.getInventory().getItemInOffHand();
         if (!item.isMissile(held)) return;
 
+        // Make a final reference for use in lambda
+        final ItemStack missileItem = held;
+
         if (isReloading(shooter)) return;
 
-        if (item.getAmmo(held) <= 0) {
-            startReload(shooter, held);
+        // Check if player has too many missiles in inventory
+        int missileCount = countMissilesInInventory(shooter);
+        int maxAllowed = item.getMaxAmount();
+        if (missileCount > maxAllowed) {
+            shooter.sendMessage(msg.format("limit-hsm", Map.of("max", String.valueOf(maxAllowed)), true));
+            return;
+        }
+
+        if (item.getAmmo(missileItem) <= 0) {
+            startReload(shooter, missileItem);
             return;
         }
 
@@ -118,8 +129,8 @@ public class MissileManager implements Listener {
         Player target = targetOpt.get();
 
         // consume ammo (capacity 1)
-        item.setAmmo(held, 0);
-        item.showSubtitleFor(shooter, held);
+        item.setAmmo(missileItem, 0);
+        item.showSubtitleFor(shooter, missileItem);
 
         // fire projectile
         launch(shooter, target);
@@ -130,6 +141,15 @@ public class MissileManager implements Listener {
         target.sendMessage(msg.format("shot-at-by-shooter", Map.of("shooter", shooter.getName()), true));
 
         nextShotAt.put(shooter.getUniqueId(), now + Math.max(shotDelay, equipDelay));
+
+        // Automatic reload after shooting (weapon now at 0 ammo)
+        // Start reload immediately after firing
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            // Only start reload if still at 0 ammo (in case something else modified it)
+            if (item.getAmmo(missileItem) <= 0 && !isReloading(shooter)) {
+                startReload(shooter, missileItem);
+            }
+        }, 1L); // Small delay to ensure shot completes first
     }
 
     private void launch(Player shooter, Player target) {
@@ -145,6 +165,12 @@ public class MissileManager implements Listener {
 
     public void startReload(Player p, ItemStack held) {
         if (isReloading(p)) return;
+
+        // Check if weapon is already fully loaded (capacity is 1)
+        if (item.getAmmo(held) >= 1) {
+            // Weapon is already at max ammo, don't reload
+            return;
+        }
 
         ReloadState rs = new ReloadState();
         rs.boundItem = held;
@@ -173,9 +199,17 @@ public class MissileManager implements Listener {
         if (rs.completeTask != null) rs.completeTask.cancel();
         for (BukkitTask t : rs.soundTasks) if (t != null) t.cancel();
 
-        // clear reloading flag & update action bar
+        // clear reloading flag & reset action bar to default
         item.setReloadingFlag(rs.boundItem, false);
-        item.showSubtitleFor(p, rs.boundItem);
+
+        // Check if player is still holding the missile and update subtitle
+        ItemStack main = p.getInventory().getItemInMainHand();
+        ItemStack off = p.getInventory().getItemInOffHand();
+        if (item.isMissile(main) || item.isMissile(off)) {
+            // Update subtitle to show current state without reload indicator
+            ItemStack held = item.isMissile(main) ? main : off;
+            item.showSubtitleFor(p, held);
+        }
     }
 
     private void finishReload(Player p) {
@@ -236,6 +270,18 @@ public class MissileManager implements Listener {
         }
     }
 
+    // ------------------ HELPER METHODS ------------------
+
+    private int countMissilesInInventory(Player p) {
+        int count = 0;
+        for (ItemStack stack : p.getInventory().getContents()) {
+            if (item.isMissile(stack)) {
+                count += stack.getAmount();
+            }
+        }
+        return count;
+    }
+
     // ------------------ SOUND SCHEDULING ------------------
 
     private record SoundAt(Location loc, Sound sound, float vol, float pitch, long delay) {}
@@ -271,7 +317,18 @@ public class MissileManager implements Listener {
         ItemStack dropped = e.getItemDrop().getItemStack();
         if (!item.isMissile(dropped)) return;
         e.setCancelled(true); // prevent the drop
-        startReload(e.getPlayer(), dropped);
+
+        Player p = e.getPlayer();
+
+        // Check if already reloading - if so, don't start another reload
+        if (isReloading(p)) {
+            return;
+        }
+
+        // Only start reload if not at max ammo
+        if (item.getAmmo(dropped) < 1) {
+            startReload(p, dropped);
+        }
     }
 
     @EventHandler
@@ -282,18 +339,31 @@ public class MissileManager implements Listener {
         MissileProjectile mp = active.remove(s.getUniqueId());
         if (mp == null) return;
 
+        Location impactLoc = s.getLocation();
         Player hit = null;
         if (e.getHitEntity() instanceof Player hp) hit = hp;
         if (hit == null) {
-            var near = s.getLocation().getNearbyPlayers(1.2).stream().findFirst().orElse(null);
+            var near = impactLoc.getNearbyPlayers(1.2).stream().findFirst().orElse(null);
             if (near != null) hit = near;
         }
+
+        // Create explosion at impact location
+        // Parameters: location, power, set fire, break blocks
+        // Using moderate explosion that doesn't destroy blocks by default
+        impactLoc.getWorld().createExplosion(impactLoc, 3.0f, false, false);
+
+        // Add visual effects for more dramatic impact
+        World w = impactLoc.getWorld();
+        w.spawnParticle(Particle.EXPLOSION, impactLoc, 1);
+        w.spawnParticle(Particle.LARGE_SMOKE, impactLoc, 20, 0.5, 0.5, 0.5, 0.1);
+        w.spawnParticle(Particle.FLAME, impactLoc, 30, 0.8, 0.8, 0.8, 0.05);
+
         if (hit != null) {
             hit.damage(mp.damage, mp.shooter);
             if (potionType != null && potionDur > 0 && potionLvl > 0) {
                 hit.addPotionEffect(new PotionEffect(potionType, potionDur, potionLvl - 1));
             }
-            playSounds(s.getLocation(), hitNoises);
+            playSounds(impactLoc, hitNoises);
             mp.shooter.sendMessage(msg.format("target-hit", Map.of("target", hit.getName()), true));
         }
         s.remove();

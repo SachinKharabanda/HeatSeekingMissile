@@ -15,12 +15,12 @@ Missile-settings:
     - "&7&o(Target receives poison and"
     - "&7&oslowness upon impact)"
   Subtitle-display: "&cHeat Seeking Missile «%ammo%»"
-  Custom-model-data: -1        # set to a positive int to enable
-  Glow: false                  # true to add a hidden enchant glow
-  Unbreakable: true            # hide durability bar
+  Custom-model-data: -1 # set to a positive int to enable
+  Glow: false # true to add a hidden enchant glow
+  Unbreakable: true # hide durability bar
   Flags: [HIDE_ENCHANTS, HIDE_ATTRIBUTES]
-  PDC-key: "hsm_missile"       # internal ID used to recognize the item
-  Default-amount: 1            # what /hsm get should give by default
+  PDC-key: "hsm_missile" # internal ID used to recognize the item
+  Default-amount: 1 # what /hsm get should give by default
   Shoot:
     Projectile-dmg: 25
     Projectile-speed: 15

@@ -6,9 +6,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class Commands implements CommandExecutor {
@@ -61,6 +63,15 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage(msg.get().withPrefix("no-perms"));
                     return true;
                 }
+
+                // Check if adding a missile would exceed the maximum
+                int currentCount = countMissilesInInventory(player);
+                int maxAllowed = missileItem.getMaxAmount();
+                if (currentCount >= maxAllowed) {
+                    player.sendMessage(msg.get().format("limit-hsm", Map.of("max", String.valueOf(maxAllowed)), true));
+                    return true;
+                }
+
                 missileItem.give(player);
                 player.sendMessage(msg.get().withPrefix("received-hsm"));
                 return true;
@@ -80,6 +91,16 @@ public class Commands implements CommandExecutor {
                     sender.sendMessage("Player not found."); // add a messages.yml key later if you want
                     return true;
                 }
+
+                // Check if target player can receive a missile
+                int currentCount = countMissilesInInventory(target);
+                int maxAllowed = missileItem.getMaxAmount();
+                if (currentCount >= maxAllowed) {
+                    sender.sendMessage(msg.get().format("limit-hsm", Map.of("max", String.valueOf(maxAllowed)), true)
+                            .replace("Your", target.getName() + " is"));
+                    return true;
+                }
+
                 missileItem.give(target);
                 sender.sendMessage(
                         msg.get().withPrefix("sent-hsm").replace("%target%", target.getName())
@@ -95,5 +116,15 @@ public class Commands implements CommandExecutor {
                 return true;
             }
         }
+    }
+
+    private int countMissilesInInventory(Player p) {
+        int count = 0;
+        for (ItemStack stack : p.getInventory().getContents()) {
+            if (stack != null && missileItem.isMissile(stack)) {
+                count += stack.getAmount();
+            }
+        }
+        return count;
     }
 }

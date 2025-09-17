@@ -214,5 +214,9 @@ public class MissileItem {
                 net.md_5.bungee.api.chat.TextComponent.fromLegacyText(color(msg)));
     }
 
+    /** Get the maximum amount of missiles allowed in inventory from config. */
+    public int getMaxAmount() {
+        return maxAmount;
+    }
 
 }
