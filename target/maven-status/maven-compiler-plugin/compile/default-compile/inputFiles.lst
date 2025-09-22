@@ -1,7 +1,8 @@
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\Commands.java
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\ConfigManager.java
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\HeatSeekingMissile.java
-C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\missile\HomingLogic.java
+C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\hooks\EssentialsHook.java
+C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\hooks\GangsPlusHook.java
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\missile\MissileHoldListener.java
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\missile\MissileItem.java
 C:\Users\Sachi\Documents\HeatSeekingMissile\src\main\java\me\sachin\heatSeekingMissile\missile\MissileManager.java

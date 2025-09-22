@@ -1,5 +1,6 @@
-me\sachin\heatSeekingMissile\missile\HomingLogic.class
 me\sachin\heatSeekingMissile\missile\MissileManager.class
+me\sachin\heatSeekingMissile\hooks\EssentialsHook.class
+me\sachin\heatSeekingMissile\hooks\GangsPlusHook.class
 me\sachin\heatSeekingMissile\missile\MissileManager$SoundAt.class
 me\sachin\heatSeekingMissile\missile\MissileShootListener.class
 me\sachin\heatSeekingMissile\missile\MissileHoldListener.class

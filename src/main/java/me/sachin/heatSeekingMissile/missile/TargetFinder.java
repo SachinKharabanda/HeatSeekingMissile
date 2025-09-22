@@ -1,5 +1,7 @@
 package me.sachin.heatSeekingMissile.missile;
 
+import me.sachin.heatSeekingMissile.hooks.EssentialsHook;
+import me.sachin.heatSeekingMissile.hooks.GangsPlusHook;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -43,6 +45,30 @@ public class TargetFinder {
         Team ta = a.getScoreboard().getEntryTeam(a.getName());
         Team tb = b.getScoreboard().getEntryTeam(b.getName());
         if (ta != null && ta == tb && !ta.allowFriendlyFire()) return false;
+
+        // Check for NPCs (Citizens plugin)
+        if (b.hasMetadata("NPC")) return false;
+
+        // Check for EssentialsX god mode using hook
+        try {
+            if (EssentialsHook.isEnabled() && EssentialsHook.hasGodMode(b)) {
+                return false;
+            }
+        } catch (NoClassDefFoundError e) {
+            // Essentials classes not available, skip
+        }
+
+        // Check for GangsPlus gang membership and alliances using hook
+        try {
+            if (GangsPlusHook.isEnabled()) {
+                // Check if they're in the same gang or allied gangs
+                if (GangsPlusHook.areInSameGang(a, b) || GangsPlusHook.areGangsAllied(a, b)) {
+                    return false;
+                }
+            }
+        } catch (NoClassDefFoundError e) {
+            // GangsPlus classes not available, skip
+        }
 
         return true;
     }

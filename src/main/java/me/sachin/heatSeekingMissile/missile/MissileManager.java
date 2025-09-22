@@ -350,7 +350,9 @@ public class MissileManager implements Listener {
         // Create explosion at impact location
         // Parameters: location, power, set fire, break blocks
         // Using moderate explosion that doesn't destroy blocks by default
-        impactLoc.getWorld().createExplosion(impactLoc, 3.0f, false, false);
+        // Attribute the explosion to the shooter so combat-tag plugins register it
+        impactLoc.getWorld().createExplosion(mp.shooter, impactLoc, 3.0f, false, false);
+
 
         // Add visual effects for more dramatic impact
         World w = impactLoc.getWorld();

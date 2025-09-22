@@ -28,6 +28,8 @@
                     <target>${java.version}</target>
                 </configuration>
             </plugin>
+
+            <!-- Shade: exclude GangsPlus so it isn't bundled into your plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -35,13 +37,19 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>me.sachin.external:GangsPlus</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
+
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -55,6 +63,11 @@
             <id>papermc-repo</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+
+        <repository>
+            <id>essentials-releases</id>
+            <url>https://repo.essentialsx.net/releases/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -64,5 +77,24 @@
             <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- GangsPlus from /lib -->
+        <dependency>
+            <groupId>me.sachin.external</groupId>
+            <artifactId>GangsPlus</artifactId>
+            <version>2.39.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/GangsPlus-2.39.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>net.essentialsx</groupId>
+            <artifactId>EssentialsX</artifactId>
+            <version>2.21.2</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
+
+
 </project>

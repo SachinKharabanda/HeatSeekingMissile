@@ -2,6 +2,7 @@ name: HeatSeekingMissile
 version: '1.0-SNAPSHOT'
 main: me.sachin.heatSeekingMissile.HeatSeekingMissile
 api-version: '1.21'
+softdepend: [GangsPlus, Essentials]
 commands:
   hsm:
     description: Heat Seeking Missile commands
