@@ -23,7 +23,7 @@ public class MissileManager implements Listener {
 
     private final JavaPlugin plugin;
     private final ConfigManager cfgMgr;
-    private final Msg msg;
+    private Msg msg;  // CHANGED: Removed 'final' so it can be updated
     private final MissileItem item;
 
     private final Map<UUID, MissileProjectile> active = new HashMap<>();
@@ -88,6 +88,10 @@ public class MissileManager implements Listener {
         plugin.getLogger().info("[HSM] Reloaded Shoot/Reload snapshot: radius=" + radius + ", chase=" + chaseTicks + ", reloadTime=" + reloadTime);
     }
 
+    // NEW METHOD: Update the Msg instance after reload
+    public void updateMsg(Msg newMsg) {
+        this.msg = newMsg;
+    }
 
     public boolean isReloading(Player p) { return reloads.containsKey(p.getUniqueId()); }
     public boolean requiresInHand() { return reloadInHand; }

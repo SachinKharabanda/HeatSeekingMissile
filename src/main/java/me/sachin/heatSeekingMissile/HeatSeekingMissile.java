@@ -48,7 +48,8 @@ public final class HeatSeekingMissile extends JavaPlugin {
         msg = new Msg(configs.messages());
         missileItem.reload();
         if (missileManager != null) {
-            missileManager.reloadFromConfig();  // <-- this is what updates Shoot.* and Reload.*
+            missileManager.reloadFromConfig();  // <-- this updates Shoot.* and Reload.*
+            missileManager.updateMsg(msg);      // <-- NEW: Update the Msg instance in MissileManager
         }
     }
 
